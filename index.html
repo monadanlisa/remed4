@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kuis Remedial Nilai 4 - Informatika SMP</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 480px;
+      background-color: var(--card-bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      position: relative;
+    }
+
+    .header {
+      background-color: var(--primary);
+      color: white;
+      padding: 16px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .container {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Auth Screen */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    select:disabled {
+      background-color: #f1f5f9;
+    }
+
+    .info-card {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 16px 0;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:active {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-primary:disabled {
+      background-color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    /* Quiz Screen */
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .timer {
+      font-weight: bold;
+      color: var(--danger);
+      background: #fef2f2;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .question-box {
+      font-size: 1rem;
+      line-height: 1.5;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      text-align: left;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .option-btn.selected {
+      border-color: var(--primary);
+      background-color: #eff6ff;
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .nav-buttons button {
+      flex: 1;
+    }
+
+    .grid-toggle-btn {
+      background-color: #f1f5f9;
+      color: var(--text);
+      border: 1px solid var(--border);
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .grid-item {
+      padding: 8px 0;
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .grid-item.answered {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .grid-item.active {
+      border: 2px solid var(--warning);
+    }
+
+    /* Anti-Cheat Overlay */
+    #warning-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: rgba(0, 0, 0, 0.95);
+      color: white;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    #warning-overlay h2 {
+      color: var(--danger);
+      margin-bottom: 12px;
+    }
+
+    #warning-overlay button {
+      margin-top: 20px;
+      width: auto;
+      padding: 10px 24px;
+    }
+
+    /* Result Screen */
+    .result-box {
+      text-align: center;
+      padding: 24px 0;
+    }
+
+    .score-badge {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 12px 0;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    .status-badge.lulus {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-badge.gagal {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="header">INFORMATIKA SMP</div>
+
+  <!-- 1. SCREEN AUTENTIKASI -->
+  <div id="auth-screen" class="container">
+    <h2 style="font-size: 1.2rem; margin-bottom: 16px; text-align: center;">Remedial Nilai 4</h2>
+    
+    <div class="form-group">
+      <label for="select-kelas">Pilih Kelas:</label>
+      <select id="select-kelas" onchange="onKelasChange()">
+        <option value="">-- Pilih Kelas --</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="select-nama">Pilih Nama Siswa:</label>
+      <select id="select-nama" disabled onchange="onNamaChange()">
+        <option value="">-- Pilih Nama --</option>
+      </select>
+    </div>
+
+    <div id="student-info" class="info-card hidden"></div>
+
+    <button id="btn-start" class="btn-primary" disabled onclick="startQuiz()">Mulai Kuis Remedial</button>
+  </div>
+
+  <!-- 2. SCREEN KUIS -->
+  <div id="quiz-screen" class="container hidden">
+    <div class="quiz-header">
+      <span id="question-progress" style="font-weight: 600; font-size: 0.9rem;">Soal 1 dari 50</span>
+      <div class="timer" id="timer-display">60:00</div>
+    </div>
+
+    <div class="question-box" id="question-text">Loading Soal...</div>
+
+    <div class="options-container" id="options-box"></div>
+
+    <div class="nav-buttons">
+      <button class="btn-primary" style="background:#64748b" id="btn-prev" onclick="prevQuestion()">Kembali</button>
+      <button class="btn-primary" id="btn-next" onclick="nextQuestion()">Lanjut</button>
+    </div>
+
+    <button class="grid-toggle-btn" onclick="toggleGrid()">Navigasi Soal (Grid)</button>
+
+    <div id="grid-box" class="grid-container hidden"></div>
+
+    <button class="btn-primary" style="background: var(--success); margin-top: 20px;" onclick="confirmSubmit()">Selesaikan Kuis</button>
+  </div>
+
+  <!-- 3. SCREEN HASIL -->
+  <div id="result-screen" class="container hidden">
+    <div class="result-box">
+      <h3>Hasil Kuis Remedial 4</h3>
+      <div id="result-score" class="score-badge">0</div>
+      <div id="result-status" class="status-badge">TIDAK LULUS</div>
+
+      <div class="info-card" id="result-summary" style="margin-top:20px; text-align:left;"></div>
+
+      <button class="btn-primary" style="margin-top: 16px;" onclick="resetToLogin()">Kembali ke Halaman Utama</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY PERINGATAN KECURANGAN -->
+<div id="warning-overlay">
+  <h2>PERINGATAN PELANGGARAN!</h2>
+  <p id="warning-text">Anda terdeteksi meninggalkan layar kuis!</p>
+  <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 8px;">Kuis akan otomatis tersubmit jika Anda melanggar lagi.</p>
+  <button class="btn-primary" onclick="dismissWarning()">Saya Mengerti</button>
+</div>
+
+<script>
+  // =========================================================================
+  // CONFIG & DATABASE
+  // =========================================================================
+  const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7lFoIqvzS4JOglMMERpKvefMlI2zWEW3LP2zmUp2OQE9h8zY1oyFWa8pLcxqQG3SL/exec"; 
+  const KKM = 82;
+  const TOTAL_SOAL_DIUJI = 50;
+  const WAKTU_KUIS_MENIT = 60;
+
+  // DATA SISWA REMEDIAL 4 (LENGKAP DENGAN NILAI AWAL)
+  const studentData = [
+    // KELAS 9D
+    { kelas: "9D", nama: "ADAM AULIAUR RAHMAN", nilaiAwal: 64 },
+    { kelas: "9D", nama: "ADRIAN DWI ARDIANSYAH", nilaiAwal: 0 },
+    { kelas: "9D", nama: "AELSA ALMAS SAFITRI", nilaiAwal: 0 },
+    { kelas: "9D", nama: "ALFAIR RAZKY QURAISYI", nilaiAwal: 0 },
+    { kelas: "9D", nama: "ALVIAN KASYA MUKHTAR", nilaiAwal: 67 },
+    { kelas: "9D", nama: "ASRIEL MOCHTAR", nilaiAwal: 82 },
+    { kelas: "9D", nama: "BUNGA VALENTINA PRAMUDI", nilaiAwal: 75 },
+    { kelas: "9D", nama: "FAREL AL-AKSYA", nilaiAwal: 78 },
+    { kelas: "9D", nama: "FAVIAN VALAS ELFRIED", nilaiAwal: 78 },
+    { kelas: "9D", nama: "FARELL RAMADHAN PRATAMA", nilaiAwal: 34 },
+    { kelas: "9D", nama: "IKAN PUTRA RAYMUND", nilaiAwal: 50 },
+    { kelas: "9D", nama: "MUHAMMAD ASKY ILHAM", nilaiAwal: 82 },
+    { kelas: "9D", nama: "MUHAMMAD AZKA AFIF", nilaiAwal: 62 },
+    { kelas: "9D", nama: "MUHAMMAD EL FABIAN", nilaiAwal: 68 },
+    { kelas: "9D", nama: "MUHAMMAD FADIL ERDI", nilaiAwal: 64 },
+    { kelas: "9D", nama: "MUHAMMAD GATHFAN", nilaiAwal: 0 },
+    { kelas: "9D", nama: "MUHAMMAD SAYYID AGIL", nilaiAwal: 60 },
+    { kelas: "9D", nama: "MONICA RIZKI ROSDIANTI", nilaiAwal: 65 },
+    { kelas: "9D", nama: "MOZA PUTRI NURSYAMSIAH", nilaiAwal: 80 },
+    { kelas: "9D", nama: "NABIL AL FARIZI", nilaiAwal: 74 },
+    { kelas: "9D", nama: "NURUL AZIZAH", nilaiAwal: 67 },
+    { kelas: "9D", nama: "RAFA ISA", nilaiAwal: 60 },
+    { kelas: "9D", nama: "RANGGA RIAN RAFARD", nilaiAwal: 67 },
+    { kelas: "9D", nama: "REYHAN ASHIF FAHD", nilaiAwal: 80 },
+    { kelas: "9D", nama: "SAYID ABDUL RASYID", nilaiAwal: 75 },
+    { kelas: "9D", nama: "TUTUT YULIANING", nilaiAwal: 72 },
+    { kelas: "9D", nama: "ZIEDAN MAULANA AKBAR", nilaiAwal: 68 },
+
+    // KELAS 9E
+    { kelas: "9E", nama: "ABIZAR AL GIFFARI", nilaiAwal: 20 },
+    { kelas: "9E", nama: "ADZKIA CINTIA M.V", nilaiAwal: 75 },
+    { kelas: "9E", nama: "AULIA NURUL JANNAH", nilaiAwal: 0 },
+    { kelas: "9E", nama: "AFI SARIFAH MAULIDA", nilaiAwal: 70 },
+    { kelas: "9E", nama: "ANGGA RAMDHANI", nilaiAwal: 72 },
+    { kelas: "9E", nama: "ANNISA DAMAYANTI", nilaiAwal: 70 },
+    { kelas: "9E", nama: "ANNA MAURIDA", nilaiAwal: 71 },
+    { kelas: "9E", nama: "ARDAN DIAN FIKRIANSYAH", nilaiAwal: 78 },
+    { kelas: "9E", nama: "DAVID MAULANA", nilaiAwal: 74 },
+    { kelas: "9E", nama: "DIEDO RAHMATULLAH", nilaiAwal: 0 },
+    { kelas: "9E", nama: "DIAN RAHMAWATI", nilaiAwal: 70 },
+    { kelas: "9E", nama: "ERWIN FERDIANSYAH", nilaiAwal: 70 },
+    { kelas: "9E", nama: "FACHRI DWI VICXON PRATAMA", nilaiAwal: 74 },
+    { kelas: "9E", nama: "FITRI RAMADHANI", nilaiAwal: 75 },
+    { kelas: "9E", nama: "HOERIA IQLIMA HERMAWAN", nilaiAwal: 20 },
+    { kelas: "9E", nama: "IKHLAS BUMI RAMADHAN", nilaiAwal: 20 },
+    { kelas: "9E", nama: "KAZI MANSURUL HASAN", nilaiAwal: 22 },
+    { kelas: "9E", nama: "M. FAHD TRIAHMADI", nilaiAwal: 20 },
+    { kelas: "9E", nama: "MUHAMAD AL FATHIR", nilaiAwal: 60 },
+    { kelas: "9E", nama: "MUHAMMAD AL FATHIR", nilaiAwal: 72 },
+    { kelas: "9E", nama: "MUHAMMAD FAREL IBRAHIM", nilaiAwal: 71 },
+    { kelas: "9E", nama: "MUHAMMAD FAUZAN FIKRI", nilaiAwal: 74 },
+    { kelas: "9E", nama: "NABILA HERMAWAN", nilaiAwal: 70 },
+    { kelas: "9E", nama: "NAJMA GINAYA PUTRI", nilaiAwal: 20 },
+    { kelas: "9E", nama: "NOVAL SIPTA PERDANA", nilaiAwal: 74 },
+    { kelas: "9E", nama: "NUR LAELATU S", nilaiAwal: 78 },
+    { kelas: "9E", nama: "NURUL SYIFA SILFIA", nilaiAwal: 70 },
+    { kelas: "9E", nama: "RIDO FERDIANSYAH", nilaiAwal: 65 },
+    { kelas: "9E", nama: "SULA THAQA", nilaiAwal: 67 },
+
+    // KELAS 9F
+    { kelas: "9F", nama: "AGISS ALIFIA SAPUTRI", nilaiAwal: 70 },
+    { kelas: "9F", nama: "ANANDA AULIA PUTRI", nilaiAwal: 20 },
+    { kelas: "9F", nama: "BAGAS PUTRA WAHYU", nilaiAwal: 0 },
+    { kelas: "9F", nama: "CINTA KHALIMATUS SA'DIAH", nilaiAwal: 0 },
+    { kelas: "9F", nama: "DINI RIFI DEANISA", nilaiAwal: 20 },
+    { kelas: "9F", nama: "FAIZAN ARYA ANSORI", nilaiAwal: 22 },
+    { kelas: "9F", nama: "FERDIAN ADITYA PUTRA", nilaiAwal: 20 },
+    { kelas: "9F", nama: "GIDEON AZKA PRATAMA", nilaiAwal: 60 },
+    { kelas: "9F", nama: "JOVI ELVIS PRATAMA", nilaiAwal: 62 },
+    { kelas: "9F", nama: "KAILA NITYAZA AZZAHRA", nilaiAwal: 0 },
+    { kelas: "9F", nama: "KAYLAN MARDIANSYAH", nilaiAwal: 20 },
+    { kelas: "9F", nama: "MAYRA BRAYNSOFIANI", nilaiAwal: 22 },
+    { kelas: "9F", nama: "MIFTAH ALFIANSHAH", nilaiAwal: 20 },
+    { kelas: "9F", nama: "MAULANA SYAPUTRA", nilaiAwal: 22 },
+    { kelas: "9F", nama: "MUHAMAD AZIZANSYAH", nilaiAwal: 0 },
+    { kelas: "9F", nama: "MUHAMAD BINTANG P.", nilaiAwal: 62 },
+    { kelas: "9F", nama: "MUHAMAD FIKRIANSYAH", nilaiAwal: 20 },
+    { kelas: "9F", nama: "MUHAMMAD FIRMANSYAH", nilaiAwal: 20 },
+    { kelas: "9F", nama: "NADILA CYNTHIA MARDAT", nilaiAwal: 70 },
+    { kelas: "9F", nama: "NADIRA MAURA MEILANI", nilaiAwal: 60 },
+    { kelas: "9F", nama: "PUTRI MEI ASRI", nilaiAwal: 70 },
+    { kelas: "9F", nama: "RAFA ERDIANSYAH", nilaiAwal: 72 },
+    { kelas: "9F", nama: "SATRIA RESKA FAJRI", nilaiAwal: 74 },
+    { kelas: "9F", nama: "SASKIA SAFITRI", nilaiAwal: 70 },
+    { kelas: "9F", nama: "TATA SUTRISNA", nilaiAwal: 70 },
+    { kelas: "9F", nama: "VICKY PRATAMA BUMI", nilaiAwal: 70 },
+    { kelas: "9F", nama: "WAHYU ADIS FRIMAN", nilaiAwal: 60 },
+    { kelas: "9F", nama: "ZAHRA AULIA SEPTIANI", nilaiAwal: 50 },
+
+    // KELAS 9G
+    { kelas: "9G", nama: "ACHMAD FATHONI MIZAN", nilaiAwal: 20 },
+    { kelas: "9G", nama: "ALIFI HERDIAN PRATAMA", nilaiAwal: 0 },
+    { kelas: "9G", nama: "ANITA SHIFFA PUTRI", nilaiAwal: 0 },
+    { kelas: "9G", nama: "AZRIEL MAULANA PRATAMA", nilaiAwal: 34 },
+    { kelas: "9G", nama: "AURA JULIA RAMADHANI", nilaiAwal: 0 },
+    { kelas: "9G", nama: "CHARENISA BHARTOLLI A.", nilaiAwal: 60 },
+    { kelas: "9G", nama: "DAFFA FIRDAUS AL-FAIZ", nilaiAwal: 24 },
+    { kelas: "9G", nama: "FACHRI ALFIAN ARDIAN", nilaiAwal: 0 },
+    { kelas: "9G", nama: "FAISAL ALMAI PRATAMA", nilaiAwal: 0 },
+    { kelas: "9G", nama: "FAIZI ADITIYA ARFIAN", nilaiAwal: 0 },
+    { kelas: "9G", nama: "FARISA SALMA VERNANDITA", nilaiAwal: 0 },
+    { kelas: "9G", nama: "FAUZAN M. ALFIAN SHIRAJ", nilaiAwal: 0 },
+    { kelas: "9G", nama: "IBRAHIM RAMADHAN S.", nilaiAwal: 0 },
+    { kelas: "9G", nama: "JUAN VALENTINO", nilaiAwal: 81 },
+    { kelas: "9G", nama: "JULIAN FADILLAH", nilaiAwal: 74 },
+    { kelas: "9G", nama: "KAILA FIRDIANA MEYLI", nilaiAwal: 0 },
+    { kelas: "9G", nama: "LISA AZAHRA", nilaiAwal: 70 },
+    { kelas: "9G", nama: "MARSHANDA AKASHA AGUSTINA", nilaiAwal: 60 },
+    { kelas: "9G", nama: "MAYETA NUR FITRIANI", nilaiAwal: 61 },
+    { kelas: "9G", nama: "MUHAMAD DATA ARIS", nilaiAwal: 60 },
+    { kelas: "9G", nama: "MUHAMAD FAHDAN B.", nilaiAwal: 0 },
+    { kelas: "9G", nama: "MUHAMAD YAZID AL FAHRI", nilaiAwal: 0 },
+    { kelas: "9G", nama: "NATASYA FITRIANI S.", nilaiAwal: 71 },
+    { kelas: "9G", nama: "NOUVAL DANIEL", nilaiAwal: 71 },
+    { kelas: "9G", nama: "PUTRA RIZKIANSYAH", nilaiAwal: 70 },
+    { kelas: "9G", nama: "RAFA ARDIANSYAH M.", nilaiAwal: 70 },
+    { kelas: "9G", nama: "RAISA ARTIASQI KAMAL", nilaiAwal: 70 },
+    { kelas: "9G", nama: "RAISYA ARTIASQI RAMADHANI", nilaiAwal: 70 },
+    { kelas: "9G", nama: "RAMA DIPANTARA", nilaiAwal: 62 },
+    { kelas: "9G", nama: "RITA KUSUMAWATI", nilaiAwal: 67 },
+
+    // KELAS 9H
+    { kelas: "9H", nama: "ADAM NURU'S ALAM", nilaiAwal: 77 },
+    { kelas: "9H", nama: "AGAN PERMANA PUTRA", nilaiAwal: 77 },
+    { kelas: "9H", nama: "AGNESTA MARCHELYTA", nilaiAwal: 0 },
+    { kelas: "9H", nama: "AURA RIZKY NAYLA", nilaiAwal: 71 },
+    { kelas: "9H", nama: "DANISH FIRAN MANDASAKTI", nilaiAwal: 78 },
+    { kelas: "9H", nama: "FANNY ANGGRAENI LESTARI", nilaiAwal: 74 },
+    { kelas: "9H", nama: "FERDIAN ARIYANTO", nilaiAwal: 72 },
+    { kelas: "9H", nama: "KAREN DESKA ADITYA S.", nilaiAwal: 70 },
+    { kelas: "9H", nama: "M. FAJRA TOFI ARSAD", nilaiAwal: 72 },
+    { kelas: "9H", nama: "M. WAFIQ APRILLIAN", nilaiAwal: 70 },
+    { kelas: "9H", nama: "MOCH. ARBIE ALGIFFARI ARSYAD", nilaiAwal: 70 },
+    { kelas: "9H", nama: "MUHAMAD RIZKI FAUZI", nilaiAwal: 74 },
+    { kelas: "9H", nama: "MUHAMMAD FADIL FAJRIN", nilaiAwal: 74 },
+    { kelas: "9H", nama: "MUHAMMAD FARHAN", nilaiAwal: 70 },
+    { kelas: "9H", nama: "MUHAMMAD MAULANA", nilaiAwal: 62 },
+    { kelas: "9H", nama: "MUHAMMAD RAFLI FAJAR", nilaiAwal: 70 },
+    { kelas: "9H", nama: "MUHAMMAD RAMDHAN PRATAMA", nilaiAwal: 70 },
+    { kelas: "9H", nama: "MUHAMMAD YUDISTIRA", nilaiAwal: 70 },
+    { kelas: "9H", nama: "OCTAVIANUS NICO ALAF", nilaiAwal: 70 },
+    { kelas: "9H", nama: "RAFFA AL-GHIFFARI", nilaiAwal: 70 },
+    { kelas: "9H", nama: "RANGGA YUNUS AL-FATHIR", nilaiAwal: 72 },
+    { kelas: "9H", nama: "RUDI ARYA ALFADLI", nilaiAwal: 70 },
+    { kelas: "9H", nama: "SASKIA RAHMAWATI", nilaiAwal: 70 },
+    { kelas: "9H", nama: "SEPIA MERYANA", nilaiAwal: 70 },
+    { kelas: "9H", nama: "SULTAN FAWWAZ ILHAM", nilaiAwal: 74 },
+    { kelas: "9H", nama: "SYAFA AMELIA", nilaiAwal: 0 },
+    { kelas: "9H", nama: "TALITHA ALYA NABILA", nilaiAwal: 0 },
+    { kelas: "9H", nama: "TEUKU MUHAMMAD PRATAMA", nilaiAwal: 0 },
+
+    // KELAS 9I
+    { kelas: "9I", nama: "A. HARIS NOOR", nilaiAwal: 0 },
+    { kelas: "9I", nama: "ADAM SYAH SULISTYO W.", nilaiAwal: 20 },
+    { kelas: "9I", nama: "AHSANUR RAMADAN D. S.", nilaiAwal: 20 },
+    { kelas: "9I", nama: "ALIN SYAFA MARSHISA", nilaiAwal: 74 },
+    { kelas: "9I", nama: "ALVIAN ARDIANSYAH ADHARI", nilaiAwal: 72 },
+    { kelas: "9I", nama: "ANGEL ARIELA GIBSON", nilaiAwal: 20 },
+    { kelas: "9I", nama: "FAREL ARDIANSYAH PRATAMA", nilaiAwal: 20 },
+    { kelas: "9I", nama: "HAFIZAH ARDINI ARIN", nilaiAwal: 0 },
+    { kelas: "9I", nama: "IGNATIA ADELIA WIJAYA", nilaiAwal: 20 },
+    { kelas: "9I", nama: "JASMINE SHAKILA SUPRIYADI", nilaiAwal: 22 },
+    { kelas: "9I", nama: "JUNITA LUKMAN SILITONGA", nilaiAwal: 20 },
+    { kelas: "9I", nama: "M. FAHRI SAPUTRA", nilaiAwal: 22 },
+    { kelas: "9I", nama: "MAYLA EKA RENGGANIS", nilaiAwal: 20 },
+    { kelas: "9I", nama: "MIA ANDINI SRI WAHYUNI", nilaiAwal: 20 },
+    { kelas: "9I", nama: "MUHAMMAD ABI FAIZ", nilaiAwal: 20 },
+    { kelas: "9I", nama: "MUHAMMAD ADITIA RAMA BURA", nilaiAwal: 20 },
+    { kelas: "9I", nama: "MUHAMMAD DIRAIL", nilaiAwal: 20 },
+    { kelas: "9I", nama: "MUHAMMAD FADLI ILHAM", nilaiAwal: 20 },
+    { kelas: "9I", nama: "MUHAMMAD FAKHRIL ISLAM", nilaiAwal: 70 },
+    { kelas: "9I", nama: "MUHAMMAD KHOIRUL RIZAL", nilaiAwal: 70 },
+    { kelas: "9I", nama: "MUHAMMAD NUR AKMAL", nilaiAwal: 70 },
+    { kelas: "9I", nama: "MUHAMMAD YUSUF AR-RIZAL", nilaiAwal: 0 },
+    { kelas: "9I", nama: "NURUL MUKHLISA AMALIA", nilaiAwal: 0 },
+    { kelas: "9I", nama: "RADEN RIZKY SEPTIANSYAH", nilaiAwal: 0 },
+    { kelas: "9I", nama: "RAIHAN AHMAD FAKHRUDIN", nilaiAwal: 0 },
+    { kelas: "9I", nama: "RAHMADANI NUR UMAH", nilaiAwal: 0 },
+    { kelas: "9I", nama: "SAPHIRATU DINAR ISLAM", nilaiAwal: 0 },
+    { kelas: "9I", nama: "SABRINA SYIFA AQILA", nilaiAwal: 0 },
+    { kelas: "9I", nama: "SABRINA SHAFIRA A.", nilaiAwal: 0 },
+    { kelas: "9I", nama: "SHAKILA RAHMA R.", nilaiAwal: 0 },
+    { kelas: "9I", nama: "SHELMA AZZAHRA J.", nilaiAwal: 0 }
+  ];
+
+  // BANK SOAL REMEDIAL 4 (60 SOAL AI & GEMINI)
+  const rawQuizData = [
+    { id: 1, q: "Rian membaca kalimat: 'AI tidak memiliki perasaan atau otak seperti manusia, tetapi ia bisa belajar dari miliaran teks di internet untuk menjawab pertanyaan kita.' Berdasarkan kalimat tersebut, bagaimana cara AI seperti Gemini menghasilkan jawaban?", opt: ["A. Dengan menebak secara acak jawaban yang diinginkan pengguna", "B. Dengan mempelajari pola bahasa dari kumpulan data besar (datasets) yang dilatihkan kepadanya", "C. Dengan menghubungi pakar secara otomatis saat diberi pertanyaan", "D. Dengan menyalin langsung seluruh isi buku perpustakaan tanpa diolah"], ans: 1 },
+    { id: 2, q: "Maya meminta Gemini membuatkan cerita fiksi tentang petualangan kucing di ruang angkasa. Gemini menghasilkan cerita baru yang belum pernah ditulis sebelumnya. Kemampuan Gemini ini termasuk dalam kategori...", opt: ["A. Robotic AI", "B. Generative AI", "C. Manual Computing", "D. Database Search"], ans: 1 },
+    { id: 3, q: "Doni bertanya tentang rumus Fisika kepada Gemini. Jawaban terlihat sangat meyakinkan, tetapi setelah dicek di buku cetak ternyata salah. Fenomena AI memberikan informasi salah dengan sangat percaya diri disebut...", opt: ["A. Ilusi Komputer", "B. Halusinasi AI", "C. Distorsi Data", "D. Imajinasi Sistem"], ans: 1 },
+    { id: 4, q: "Saat mencari informasi tentang Proklamasi Kemerdekaan, Andi menggunakan Google Search sedangkan Budi menggunakan Gemini. Perbedaan hasil yang diterima Andi dan Budi adalah...", opt: ["A. Andi mendapatkan daftar tautan web, sedangkan Budi mendapatkan teks rangkuman/jawaban langsung yang disusun AI", "B. Andi mendapatkan jawaban berupa gambar, sedangkan Budi hanya bisa menerima suara", "C. Andi tidak memerlukan koneksi internet, sedangkan Budi wajib menggunakan internet", "D. Tidak ada perbedaan sama sekali dari kedua alat tersebut"], ans: 0 },
+    { id: 5, q: "Gemini merespons dialog Bahasa Inggris dengan kata-kata ramah seperti 'I'm happy to help you!'. Apakah ini berarti Gemini benar-benar merasa senang?", opt: ["A. Ya, karena AI memiliki emosi seperti manusia jika diperlakukan dengan baik", "B. Tidak, AI hanyalah program komputer yang meniru pola bahasa manusia tanpa memiliki perasaan", "C. Ya, karena AI akan sedih jika pengguna tidak membalas pesannya", "D. Ya, emosi AI tergantung pada merk komputer yang digunakan"], ans: 1 },
+    { id: 6, q: "AI generatif dilatih menggunakan datasets. Dari manakah sumber data utama yang digunakan untuk melatih Gemini?", opt: ["A. Informasi dan teks digital publik yang jumlahnya sangat besar di internet", "B. Pesan singkat pribadi yang dikirim antar-pengguna ponsel", "C. Catatan rahasia yang tersimpan di dalam buku harian siswa", "D. Pikiran langsung para insinyur yang membuatnya"], ans: 0 },
+    { id: 7, q: "Guru menjelaskan bahwa AI bekerja menggunakan algoritma prediksi kata, bukan kesadaran diri. Maksud penjelasan tersebut adalah...", opt: ["A. AI hanya memperkirakan kata berikutnya yang paling cocok berdasarkan data latihan, sehingga bisa salah", "B. AI sengaja memberikan jawaban salah agar siswa rajin membaca", "C. AI hanya bisa menjawab dengan benar jika ditanya pada jam belajar sekolah", "D. AI tidak bisa membaca pertanyaan yang menggunakan bahasa Indonesia"], ans: 0 },
+    { id: 8, q: "Manakah dari hasil kerja berikut yang murni merupakan contoh luaran dari Generative AI?", opt: ["A. Cetakan kertas berisi nilai ujian siswa dari wali kelas", "B. Paragraf esai baru yang dibuat berdasarkan instruksi tema dari pengguna", "C. Foto yang diambil menggunakan kamera ponsel tanpa filter", "D. Daftar nomor telepon teman kelas yang diketik di spreadsheet"], ans: 1 },
+    { id: 9, q: "Sekolah mengadakan workshop bertema 'Literasi AI untuk Pelajar'. Tujuan utama sekolah mengenalkan materi ini kepada siswa adalah...", opt: ["A. Agar siswa tidak perlu lagi mengerjakan tugas sekolah secara mandiri", "B. Agar siswa dapat menggunakan teknologi AI secara bijak, kritis, dan aman", "C. Agar siswa bisa menggantikan peran guru dalam mengajar di kelas", "D. Agar siswa dapat meretas situs web sekolah dengan mudah"], ans: 1 },
+    { id: 10, q: "Budi menganggap AI sama seperti Kalkulator. Pernyataan yang paling tepat untuk mengoreksi anggapan Budi adalah...", opt: ["A. Kalkulator menghitung angka berdasarkan rumus pasti, sedangkan AI generatif mengolah bahasa/kreativitas berdasarkan pola data", "B. Kalkulator menggunakan listrik, sedangkan AI tidak menggunakan listrik", "C. Kalkulator hanya untuk siswa SD, sedangkan AI khusus untuk mahasiswa", "D. Anggapan Budi sudah 100% benar dan tidak perlu dikoreksi"], ans: 0 },
+    { id: 11, q: "Nina mendapat tugas proyek Biologi tentang daur ulang sampah dan bingung harus mulai dari mana. Penggunaan Gemini yang paling tepat adalah...", opt: ["A. Menyuruh Gemini membuatkan laporan proyek dari awal sampai akhir lalu mengumpulkannya", "B. Meminta Gemini memberikan 5 ide awal topik proyek daur ulang yang menarik untuk dikembangkan sendiri", "C. Meminta Gemini membuatkan poster proyek lalu mengakui poster itu buatan tangannya", "D. Membiarkan tugas tersebut dan tidak mengumpulkannya"], ans: 1 },
+    { id: 12, q: "Saat ujian akhir semester, Fajar berniat membuka Gemini di ponselnya secara diam-diam untuk menjawab soal sulit. Tindakan Fajar tergolong...", opt: ["A. Pemanfaatan teknologi secara cerdas dan efisien", "B. Pelanggaran kejujuran akademik dan ketidakjujuran saat ujian", "C. Bentuk kerja sama yang baik antara manusia dan AI", "D. Metode belajar modern yang direkomendasikan"], ans: 1 },
+    { id: 13, q: "Sari ingin memahami bab Sejarah sepanjang 10 halaman yang bahasanya sangat rumit. Cara terbaik Sari memanfaatkan AI adalah...", opt: ["A. Meminta AI menyederhanakan materi menjadi poin-poin penting agar lebih mudah dipahami", "B. Menyuruh AI menghapus seluruh isi bab Sejarah tersebut", "C. Mengubah materi Sejarah menjadi soal matematika", "D. Mengganti nama tokoh-tokoh sejarah dengan nama artis favoritnya"], ans: 0 },
+    { id: 14, q: "Saat menggunakan Gemini, aplikasi meminta data. Manakah informasi yang HARUS dijaga kerahasiaannya dan TIDAK boleh dimasukkan ke dalam AI?", opt: ["A. Judul topik pelajaran yang ingin dipelajari", "B. Alamat rumah lengkap, nomor HP, dan kata sandi akun", "C. Kelas atau tingkatan sekolah (misal: Kelas 8 SMP)", "D. Bahasa yang ingin digunakan dalam berinteraksi"], ans: 1 },
+    { id: 15, q: "Rizky menggunakan Gemini untuk mencari fakta tanggal peristiwa bersejarah. Tindakan literasi digital yang wajib dilakukan Rizky setelahnya adalah...", opt: ["A. Langsung memindahkan jawaban tersebut ke buku tugas tanpa dibaca", "B. Mengonfirmasi dan memeriksa kembali tanggal tersebut di buku pelajaran atau sumber resmi", "C. Menyalahkan Gemini jika penjelasannya terlalu panjang", "D. Mengirimkan jawaban tersebut ke grup obrolan tanpa menyaringnya"], ans: 1 },
+    { id: 16, q: "Bagas diminta menulis puisi karya sendiri. Ia menggunakan AI untuk mencari inspirasi gaya majas, lalu menyusun puisinya sendiri. Tindakan Bagas menunjukkan...", opt: ["A. Bagas telah melakukan plagiarisme penuh", "B. Bagas memanfaatkan AI secara bijak sebagai alat bantu ide tanpa kehilangan kreativitasnya", "C. Bagas tidak mau berusaha mengerjakan tugas", "D. Bagas melanggar seluruh aturan sekolah"], ans: 1 },
+    { id: 17, q: "Mengapa siswa dilarang keras melakukan tindakan copy-paste mentah-mentah dari AI untuk tugas sekolah?", opt: ["A. Karena tulisan dari AI selalu berukuran huruf sangat kecil", "B. Karena tindakan tersebut tidak melatih kemampuan berpikir kritis dan berisiko plagiarisme", "C. Karena AI akan menghapus akun siswa jika tulisannya disalin", "D. Karena hasil ketikan AI tidak bisa dicetak di kertas"], ans: 1 },
+    { id: 18, q: "Rani merasa jawaban Gemini tentang pembahasan soal IPA kurang masuk akal. Apa yang sebaiknya Rani lakukan?", opt: ["A. Tetap memakai jawaban itu karena yakin AI tidak pernah salah", "B. Memperbaiki kalimat pertanyaan (prompt) agar lebih jelas atau menanyakan kepada guru", "C. Mematikan komputer dan memutuskan tidak belajar lagi", "D. Marah-marah di kolom komentar AI"], ans: 1 },
+    { id: 19, q: "Dalam prinsip literasi digital, AI idealnya diposisikan oleh siswa sebagai...", opt: ["A. Pengganti kemampuan berpikir dan belajar otak manusia", "B. Mitra atau asisten belajar untuk mempermudah pemahaman konsep", "C. Penjawab otomatis seluruh kuis sekolah tanpa perlu dibaca", "D. Pengambil keputusan utama dalam kehidupan sehari-hari"], ans: 1 },
+    { id: 20, q: "Manakah dari skenario berikut yang menunjukkan penggunaan AI yang ETIS di sekolah?", opt: ["A. Tono menggunakan AI untuk membuatkan esai utuh lalu mengakuinya sebagai buatannya", "B. Lisa menggunakan AI untuk membuat garis besar (outline) presentasi, lalu mencari datanya sendiri di perpustakaan", "C. Andi menggunakan AI untuk menjawab soal kuis online saat guru tidak melihat", "D. Siska menggunakan AI untuk membuat cerita bohong tentang temannya"], ans: 1 },
+    { id: 21, q: "Fungsi utama dari Gemini dalam lingkungan belajar di sekolah adalah...", opt: ["A. Media sosial untuk membagikan foto kegiatan ekstrakurikuler", "B. Asisten AI kolaboratif yang membantu siswa berpikir, belajar, dan berkreasi", "C. Aplikasi permainan daring untuk mengisi waktu luang", "D. Platform untuk mengedit video promosi sekolah"], ans: 1 },
+    { id: 22, q: "Pak Guru menyarankan siswa mengunggah PDF materi Kimia ke NotebookLM. Apa keunggulan NotebookLM dibandingkan AI umum?", opt: ["A. NotebookLM hanya menjawab pertanyaan berdasarkan dokumen/sumber materi khusus yang diunggah siswa", "B. NotebookLM bisa mengerjakan tugas sekolah tanpa perlu dibaca oleh siswa", "C. NotebookLM bisa digunakan untuk melakukan panggilan video bersama teman", "D. NotebookLM dapat membuatkan makanan secara otomatis"], ans: 0 },
+    { id: 23, q: "Gemini disebut sebagai teknologi yang bersifat multimodal. Artinya, Gemini mampu memahami dan mengolah input berupa...", opt: ["A. Teks saja", "B. Teks, gambar, audio, dan berbagai bentuk data lainnya", "C. Angka matematika saja", "D. Bahasa pemograman koding saja"], ans: 1 },
+    { id: 24, q: "Anton ingin membuat jadwal latihan olahraga dan belajar kelompok. Bagaimana Gemini dapat membantu Anton?", opt: ["A. Gemini akan secara otomatis mengunci ponsel Anton saat jam belajar", "B. Gemini dapat menyusun draf jadwal mingguan jika Anton memberikan informasi waktu luang dan targetnya", "C. Gemini akan menggantikan Anton menghadiri belajar kelompok", "D. Gemini tidak bisa membantu urusan jadwal karena tidak memiliki jam"], ans: 1 },
+    { id: 25, q: "Apa yang dilakukan Gemini di balik layar saat siswa mengetikkan pertanyaan di kolom chat?", opt: ["A. Merekam suara siswa dan menyimpannya di memori HP", "B. Menganalisis makna teks instruksi lalu menghasilkan tanggapan yang relevan berdasarkan data latihannya", "C. Mencari nomor telepon ahli di Google untuk menjawab pertanyaan", "D. Menampilkan gambar acak dari internet tanpa penjelasan"], ans: 1 },
+    { id: 26, q: "Jika siswa memasukkan catatan pelajaran ke NotebookLM, fitur apa yang paling berguna untuk persiapan ujian?", opt: ["A. Mengubah catatan menjadi lagu pop secara otomatis", "B. Membuatkan ringkasan poin penting dan draf pertanyaan latihan dari catatan tersebut", "C. Mengirimkan catatan tersebut ke email semua guru", "D. Menghapus bagian catatan yang dianggap sulit"], ans: 1 },
+    { id: 27, q: "Mengapa memanfaatkan AI terintegrasi sekolah lebih disarankan daripada mencari informasi di forum internet sembarangan?", opt: ["A. AI memberikan bantuan yang terstruktur, fokus, dan bebas dari komentar negatif forum umum", "B. AI sekolah dijamin 100% tidak pernah memiliki kesalahan data", "C. AI sekolah dapat langsung memberikan nilai A pada rapor siswa", "D. AI sekolah tidak membutuhkan daya listrik sama sekali"], ans: 0 },
+    { id: 28, q: "Manakah kegiatan siswa berikut yang TIDAK cocok menggunakan Gemini?", opt: ["A. Berlatih percakapan Bahasa Inggris secara interaktif", "B. Mencari ide topik untuk makalah Geografi", "C. Mengisi jawaban kuis kejujuran secara otomatis", "D. Merangkum artikel berita tentang perubahan iklim"], ans: 2 },
+    { id: 29, q: "Siswa mengunggah foto diagram sel tumbuhan ke Gemini dan bertanya bagian penhasil energi. Gemini dapat menganalisis gambar tersebut karena fitur...", opt: ["A. Text-only processing", "B. Multimodal capability", "C. Automated grading", "D. Speech recognition"], ans: 1 },
+    { id: 30, q: "Siapakah perusahaan teknologi di balik pengembangan Gemini dan NotebookLM?", opt: ["A. Microsoft", "B. Google", "C. Apple", "D. Meta"], ans: 1 },
+    { id: 31, q: "Dalam dunia AI, istilah Prompt mengacu pada...", opt: ["A. Tombol power untuk mematikan komputer", "B. Teks instruksi, pertanyaan, atau perintah yang kita berikan kepada AI", "C. Hasil tanggapan atau jawaban dari AI", "D. Kode rahasia untuk mengakses internet"], ans: 1 },
+    { id: 32, q: "Desta mengetik prompt 'Jelaskan Sejarah!'. Hasil jawaban Gemini sangat luas dan tidak fokus. Kesalahan Desta adalah...", opt: ["A. Prompt terlalu pendek, tidak spesifik, dan tidak memiliki konteks", "B. Desta menggunakan bahasa Indonesia yang baik", "C. Desta mengetik menggunakan komputer, bukan ponsel", "D. Gemini sedang tidak terhubung ke jaringan"], ans: 0 },
+    { id: 33, q: "Rumus prompt efektif: Role + Task + Context + Format. Jika siswa menulis 'Bertindaklah sebagai pemandu wisata...', bagian yang terpenuhi adalah...", opt: ["A. Task (Tugas)", "B. Role (Peran)", "C. Format (Tampilan)", "D. Context (Konteks)"], ans: 1 },
+    { id: 34, q: "Perhatikan kalimat perintah: 'Buatkan 5 soal pilihan ganda tentang Hukum Newton...'. Kalimat ini merupakan elemen prompt berupa...", opt: ["A. Role (Peran)", "B. Task (Tugas)", "C. Format Output", "D. Context (Konteks)"], ans: 1 },
+    { id: 35, q: "Prompt: 'Saya siswa kelas 7 SMP yang baru belajar Matematika. Tolong jelaskan konsep pecahan desimal...'. Kalimat pertama berfungsi sebagai...", opt: ["A. Format Output", "B. Context (Konteks)", "C. Role (Peran)", "D. Task (Tugas)"], ans: 1 },
+    { id: 36, q: "Manakah dari pilihan prompt berikut yang paling LENGKAP dan EFEKTIF untuk membantu siswa belajar?", opt: ["A. 'Tolong bantu saya belajar IPA!'", "B. 'Buat esai tentang ekosistem laut.'", "C. 'Sebagai guru Biologi, jelaskan rantai makanan di laut untuk siswa SMP kelas 8 dalam bentuk 3 paragraf singkat.'", "D. 'Apa itu ekosistem laut?'"], ans: 2 },
+    { id: 37, q: "Budi ingin membandingkan kelebihan dan kekurangan energi surya dengan energi angin. Agar hasilnya rapi dan menyamping, format yang diminta adalah...", opt: ["A. Paragraf panjang", "B. Puisi", "C. Tabel perbandingan", "D. Diagram lingkaran"], ans: 2 },
+    { id: 38, q: "Penjelasan Gemini terlalu banyak menggunakan istilah rumit. Apa follow-up prompt (perintah susulan) yang paling tepat diketik Siska?", opt: ["A. 'Jawabanmu jelek sekali!'", "B. 'Tolong jelaskan ulang konsep tersebut dengan analogi sederhana sehari-hari dalam 3 kalimat.'", "C. Mengulang pertanyaan yang sama persis sebanyak 5 kali", "D. Mematikan aplikasi Gemini"], ans: 1 },
+    { id: 39, q: "Instruksi 'Tampilkan jawaban dalam bentuk poin-poin bertingkat (bullet points)' mengatur komponen prompt bagian...", opt: ["A. Role (Peran)", "B. Context (Konteks)", "C. Format Output", "D. Task (Tugas)"], ans: 2 },
+    { id: 40, q: "Mengapa mencantumkan identitas pembaca (misalnya: 'jelaskan untuk anak usia 12 tahun') sangat penting saat bertanya pada AI?", opt: ["A. Agar AI tahu berapa umur pengguna secara pasti", "B. Agar AI menyesuaikan kompleksitas bahasa dan pilihan kata agar sesuai tingkat pemahaman", "C. Agar AI memberikan diskon biaya penggunaan", "D. Agar AI menolak memberikan jawaban yang panjang"], ans: 1 },
+    { id: 41, q: "Rian mengubah prompt 'Buatkan cerita robot' menjadi 'Buatkan cerita pendek tentang robot ramah yang membantu siswa merawat taman sekolah'. Proses ini disebut...", opt: ["A. Prompt Hacking", "B. Prompt Refinement / Iterasi", "C. Prompt Deleting", "D. Prompt Copying"], ans: 1 },
+    { id: 42, q: "Bagaimana cara terbaik meminta Gemini memeriksa tata bahasa esai Bahasa Inggris tugas sekolahmu?", opt: ["A. 'Perbaiki esai ini!'", "B. 'Tolong periksa kesalahan grammar pada esai Bahasa Inggris berikut, lalu berikan saran perbaikannya beserta alasannya: [tempel teks]'", "C. 'Ubah esai ini jadi bahasa Indonesia.'", "D. 'Buatkan esai Bahasa Inggris yang baru.'"], ans: 1 },
+    { id: 43, q: "Elemen prompt yang menentukan batasan tampilan seperti jumlah kata, bentuk tulisan, atau struktur paragraf disebut...", opt: ["A. Role", "B. Context", "C. Format Output", "D. Task"], ans: 2 },
+    { id: 44, q: "Mengapa menyertakan contoh (contoh format/contoh jawaban) di dalam prompt sangat dianjurkan?", opt: ["A. Agar AI bisa menyalin contoh tersebut tanpa berpikir", "B. Agar AI memahami pola hasil yang kita inginkan dengan lebih akurat (few-shot prompting)", "C. Agar proses mengetik menjadi lebih lama", "D. Agar komputer tidak mengalami kelebihan beban"], ans: 1 },
+    { id: 45, q: "Prompt mana yang menunjukkan etika dan teknik prompting yang benar saat ingin AI memeriksa draf puisi buatanmu?", opt: ["A. 'Tuliskan puisi baru buat saya.'", "B. 'Berikut puisi buatan saya: [teks]. Bertindaklah sebagai kritikus sastra, berikan masukan pada pemilihan kata (diksi) tanpa mengubah isi puisinya.'", "C. 'Ubah puisi ini jadi cerita pendek.'", "D. 'Puisi ini bagus atau tidak?'"], ans: 1 },
+    { id: 46, q: "Konsep Digital Citizenship (Kewargaan Digital) dalam pemanfaatan AI menekankan siswa untuk...", opt: ["A. Menggunakan teknologi AI secara jujur, aman, etis, dan bertanggung jawab", "B. Mengunggah semua hasil jawaban AI ke media sosial", "C. Memiliki banyak akun AI dengan nama samaran", "D. Menggunakan AI untuk menghindari seluruh tugas sekolah"], ans: 0 },
+    { id: 47, q: "Nadia menuliskan catatan: 'Kerangka esai ini disusun dengan bantuan panduan ide dari Gemini AI' saat mengumpulkan tugas. Sikap Nadia mencerminkan...", opt: ["A. Tindakan plagiarisme", "B. Sikap transparan dan integritas akademik yang baik", "C. Pelanggaran aturan sekolah", "D. Ketidakmampuan dalam menulis esai"], ans: 1 },
+    { id: 48, q: "Mengapa mengunggah foto dokumen resmi seperti Kartu Keluarga, NISN, atau data pribadi ke platform AI sangat berbahaya?", opt: ["A. Karena AI akan otomatis menghapus file tersebut dari ponsel", "B. Karena data pribadi dapat tersimpan di peladen (server) dan berisiko bocor atau disalahgunakan", "C. Karena AI tidak bisa membaca dokumen berbentuk gambar", "D. Karena akan membuat jaringan internet sekolah menjadi lambat"], ans: 1 },
+    { id: 49, q: "Budi melihat informasi dari Gemini bahwa besok libur nasional. Sebelum menyebarkan informasi ke grup kelas, yang harus dilakukan Budi adalah...", opt: ["A. Langsung membagikannya agar menjadi yang pertama tahu", "B. Melakukan verifikasi informasi (fact-checking) ke kalender resmi pemerintah atau pengumuman sekolah", "C. Menyuruh teman-temannya tidak datang ke sekolah", "D. Memarahi Gemini karena memberikan informasi libur"], ans: 1 },
+    { id: 50, q: "Siswa menggunakan AI membuat foto rekayasa (deepfake) temannya untuk ejekan. Perbuatan siswa tersebut melanggar...", opt: ["A. Etika digital, privasi, dan aturan hukum cyberbullying", "B. Kecepatan mengetik di komputer", "C. Kapasitas memori penyimpanan ponsel", "D. Tata tertib penggunaan perpustakaan"], ans: 0 },
+    { id: 51, q: "Apabila sekolah memiliki panduan resmi penggunaan AI dalam pembelajaran, sikap yang paling bijak adalah...", opt: ["A. Mengabaikannya selama guru tidak mengawasi", "B. Memahami dan mematuhi panduan tersebut sebagai batasan penggunaan AI secara bertanggung jawab", "C. Mengajak teman-teman untuk memprotes panduan tersebut", "D. Menghapus aplikasi AI dari perangkat pribadi"], ans: 1 },
+    { id: 52, q: "Pengertian dari plagiarisme dalam konteks penggunaan AI di sekolah adalah...", opt: ["A. Menggunakan AI untuk mencari inspirasi ide", "B. Menyalin karya/teks buatan AI secara utuh dan mengakuinya sebagai hasil pemikiran sendiri", "C. Meminta AI menjelaskan rumus matematika", "D. Memperbaiki tata bahasa tulisan sendiri menggunakan AI"], ans: 1 },
+    { id: 53, q: "Sikap kritis yang harus dimiliki siswa saat menerima informasi dari AI adalah...", opt: ["A. Percaya 100% karena AI dikembangkan oleh perusahaan canggih", "B. Selalu bersikap skeptis positif dengan memeriksa fakta dan sumber asli sebelum mempercayainya", "C. Menolak semua jawaban yang diberikan oleh AI", "D. Menganggap AI hanya bisa menjawab soal-soal yang mudah"], ans: 1 },
+    { id: 54, q: "Mengapa penting bagi siswa untuk menjaga data privacy (privasi data) saat menggunakan platform AI?", opt: ["A. Untuk melindungi identitas pribadi dari kejahatan siber dan penyalahgunaan data", "B. Supaya baterai ponsel tidak cepat habis", "C. Supaya tampilan aplikasi AI menjadi lebih menarik", "D. Supaya nilai ujian sekolah otomatis meningkat"], ans: 0 },
+    { id: 55, q: "Generasi muda yang bijak AI (AI-savvy) adalah mereka yang...", opt: ["A. Menolak menggunakan AI sama sekali", "B. Menggantungkan seluruh tugas dan pemikirannya pada AI", "C. Menguasai cara kerja AI, memanfaatkannya untuk efisiensi, serta tetap mengedepankan etika dan pemikiran kritis mandiri", "D. Menggunakan AI hanya untuk kecurangan"], ans: 2 },
+    { id: 56, q: "Program Sertifikasi Gemini untuk Siswa diselenggarakan oleh Google dengan tujuan utama untuk...", opt: ["A. Menguji siapa siswa yang paling cepat mengetik di komputer", "B. Memvalidasi bahwa siswa memiliki literasi AI, etika digital, dan keterampilan prompting yang bertaraf standar", "C. Menggantikan peran ujian nasional di sekolah", "D. Memaksa siswa membeli produk-produk baru Google"], ans: 1 },
+    { id: 57, q: "Dalam ujian sertifikasi pembuatan prompt, pilihan jawaban yang paling mungkin BENAR adalah opsi yang...", opt: ["A. Hanya terdiri dari satu kata perintah yang singkat", "B. Memiliki struktur instruksi yang jelas (memuat peran, tugas, konteks, dan format)", "C. Menggunakan bahasa gaul yang tidak baku", "D. Meminta AI mengerjakan ujian sekolah secara utuh"], ans: 1 },
+    { id: 58, q: "Sebelum mengklik tombol 'Selesaikan Ujian' pada ujian Sertifikasi Gemini, langkah literasi yang paling tepat adalah...", opt: ["A. Memeriksa kembali seluruh jawaban dengan cermat dan memastikan tidak ada soal yang terlewat", "B. Langsung menutup halaman ujian tanpa memeriksa", "C. Mematikan koneksi internet secara mendadak", "D. Mengubah semua jawaban menjadi opsi A"], ans: 0 },
+    { id: 59, q: "Manfaat langsung yang diperoleh siswa setelah lulus dan mendapatkan sertifikat Gemini untuk Siswa adalah...", opt: ["A. Terbebas dari semua tugas sekolah selamanya", "B. Memiliki bukti kredensial resmi literasi AI yang dapat memperkuat portofolio beasiswa atau pendaftaran sekolah/kuliah", "C. Mendapatkan hadiah laptop gratis dari Google", "D. Otomatis diterima di semua universitas tanpa tes"], ans: 1 },
+    { id: 60, q: "Kalimat penutup yang paling menggambarkan filosofi penggunaan AI bagi pelajar masa kini adalah...", opt: ["A. 'Biarkan AI berpikir, kita tinggal menerima hasilnya.'", "B. 'Jadikan AI sebagai alat yang memperluas wawasan, sementara otak kita tetap menjadi pengemudinya.'", "C. 'Hindari AI karena teknologi hanya akan membuat manusia menjadi malas.'", "D. 'Gunakan AI hanya saat kita tidak ingin belajar.'"], ans: 1 }
+  ];
+
+  // =========================================================================
+  // APP STATE & LOGIC
+  // =========================================================================
+  let currentStudent = null;
+  let quizQuestions = [];
+  let userAnswers = {};
+  let currentQuestionIdx = 0;
+  let timerInterval = null;
+  let timeRemaining = WAKTU_KUIS_MENIT * 60;
+  let violationCount = 0;
+
+  window.onload = function() {
+    populateKelasDropdown();
+    checkLocalStorageOnLoad();
+    setupSecurityListeners();
+  };
+
+  function populateKelasDropdown() {
+    const kelasSet = [...new Set(studentData.map(s => s.kelas))];
+    const selectKelas = document.getElementById('select-kelas');
+    selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+    kelasSet.forEach(k => {
+      selectKelas.innerHTML += `<option value="${k}">${k}</option>`;
+    });
+  }
+
+  function onKelasChange() {
+    const kelas = document.getElementById('select-kelas').value;
+    const selectNama = document.getElementById('select-nama');
+    const infoCard = document.getElementById('student-info');
+    const btnStart = document.getElementById('btn-start');
+
+    selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+    infoCard.classList.add('hidden');
+    btnStart.disabled = true;
+
+    if (!kelas) {
+      selectNama.disabled = true;
+      return;
+    }
+
+    const filteredStudents = studentData.filter(s => s.kelas === kelas);
+    filteredStudents.forEach(s => {
+      selectNama.innerHTML += `<option value="${s.nama}">${s.nama}</option>`;
+    });
+    selectNama.disabled = false;
+  }
+
+  function onNamaChange() {
+    const kelas = document.getElementById('select-kelas').value;
+    const nama = document.getElementById('select-nama').value;
+    const infoCard = document.getElementById('student-info');
+    const btnStart = document.getElementById('btn-start');
+
+    if (!nama) {
+      infoCard.classList.add('hidden');
+      btnStart.disabled = true;
+      return;
+    }
+
+    currentStudent = studentData.find(s => s.kelas === kelas && s.nama === nama);
+
+    if (currentStudent) {
+      const isLulus = currentStudent.nilaiAwal >= KKM;
+      infoCard.innerHTML = `
+        <strong>Mata Pelajaran:</strong> Informatika SMP<br>
+        <strong>Kategori:</strong> Remedial Nilai 4<br>
+        <strong>Nilai Awal:</strong> ${currentStudent.nilaiAwal}<br>
+        <strong>Target KKM:</strong> ${KKM}<br>
+        <strong>Status Awal:</strong> <span style="color:${isLulus ? 'var(--success)' : 'var(--danger)'}">${isLulus ? 'LULUS KKM' : 'Belum Lulus'}</span>
+      `;
+      infoCard.classList.remove('hidden');
+
+      if (isLulus) {
+        btnStart.disabled = true;
+        btnStart.innerText = "Anda Sudah Lulus KKM";
+      } else {
+        btnStart.disabled = false;
+        btnStart.innerText = "Mulai Kuis Remedial";
+      }
+    }
+  }
+
+  function shuffleArray(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function startQuiz() {
+    requestFullScreen();
+
+    const shuffledRaw = shuffleArray(rawQuizData).slice(0, TOTAL_SOAL_DIUJI);
+    
+    quizQuestions = shuffledRaw.map(q => {
+      let optionsWithKey = q.opt.map((optText, index) => ({
+        text: optText,
+        isCorrect: index === q.ans
+      }));
+      let shuffledOptions = shuffleArray(optionsWithKey);
+      return { q: q.q, options: shuffledOptions };
+    });
+
+    userAnswers = {};
+    timeRemaining = WAKTU_KUIS_MENIT * 60;
+    currentQuestionIdx = 0;
+    violationCount = 0;
+
+    saveStateToLocalStorage();
+    initQuizUI();
+  }
+
+  function initQuizUI() {
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+
+    renderQuestion();
+    renderGrid();
+    startTimer();
+  }
+
+  function renderQuestion() {
+    const qData = quizQuestions[currentQuestionIdx];
+    document.getElementById('question-progress').innerText = `Soal ${currentQuestionIdx + 1} dari ${TOTAL_SOAL_DIUJI}`;
+    document.getElementById('question-text').innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+    const optionsBox = document.getElementById('options-box');
+    optionsBox.innerHTML = '';
+
+    qData.options.forEach((opt, idx) => {
+      const isSelected = userAnswers[currentQuestionIdx] === idx;
+      const btn = document.createElement('button');
+      btn.className = `option-btn ${isSelected ? 'selected' : ''}`;
+      btn.innerText = opt.text;
+      btn.onclick = () => selectOption(idx);
+      optionsBox.appendChild(btn);
+    });
+
+    document.getElementById('btn-prev').style.visibility = currentQuestionIdx === 0 ? 'hidden' : 'visible';
+    document.getElementById('btn-next').innerText = currentQuestionIdx === TOTAL_SOAL_DIUJI - 1 ? 'Selesai' : 'Lanjut';
+    
+    updateGridUI();
+  }
+
+  function selectOption(optionIndex) {
+    userAnswers[currentQuestionIdx] = optionIndex;
+    saveStateToLocalStorage();
+    renderQuestion();
+  }
+
+  function nextQuestion() {
+    if (currentQuestionIdx < TOTAL_SOAL_DIUJI - 1) {
+      currentQuestionIdx++;
+      renderQuestion();
+    } else {
+      confirmSubmit();
+    }
+  }
+
+  function prevQuestion() {
+    if (currentQuestionIdx > 0) {
+      currentQuestionIdx--;
+      renderQuestion();
+    }
+  }
+
+  function renderGrid() {
+    const gridBox = document.getElementById('grid-box');
+    gridBox.innerHTML = '';
+    for (let i = 0; i < TOTAL_SOAL_DIUJI; i++) {
+      const item = document.createElement('div');
+      item.id = `grid-item-${i}`;
+      item.className = 'grid-item';
+      item.innerText = i + 1;
+      item.onclick = () => {
+        currentQuestionIdx = i;
+        renderQuestion();
+      };
+      gridBox.appendChild(item);
+    }
+    updateGridUI();
+  }
+
+  function updateGridUI() {
+    for (let i = 0; i < TOTAL_SOAL_DIUJI; i++) {
+      const item = document.getElementById(`grid-item-${i}`);
+      if (!item) continue;
+      
+      item.className = 'grid-item';
+      if (userAnswers[i] !== undefined) item.classList.add('answered');
+      if (i === currentQuestionIdx) item.classList.add('active');
+    }
+  }
+
+  function toggleGrid() {
+    const gridBox = document.getElementById('grid-box');
+    gridBox.classList.toggle('hidden');
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeRemaining--;
+      saveStateToLocalStorage();
+
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+      document.getElementById('timer-display').innerText = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval);
+        alert("Waktu habis! Kuis akan otomatis tersubmit.");
+        submitQuiz(true);
+      }
+    }, 1000);
+  }
+
+  function saveStateToLocalStorage() {
+    const sessionData = {
+      student: currentStudent,
+      questions: quizQuestions,
+      answers: userAnswers,
+      time: timeRemaining,
+      questionIdx: currentQuestionIdx,
+      violations: violationCount
+    };
+    localStorage.setItem('remedial4_quiz_state', JSON.stringify(sessionData));
+  }
+
+  function checkLocalStorageOnLoad() {
+    const saved = localStorage.getItem('remedial4_quiz_state');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        if (confirm(`Ditemukan sesi kuis aktif untuk ${data.student.nama}. Lanjutkan pengerjaan?`)) {
+          currentStudent = data.student;
+          quizQuestions = data.questions;
+          userAnswers = data.answers;
+          timeRemaining = data.time;
+          currentQuestionIdx = data.questionIdx;
+          violationCount = data.violations || 0;
+          initQuizUI();
+        } else {
+          localStorage.removeItem('remedial4_quiz_state');
+        }
+      } catch (e) {
+        localStorage.removeItem('remedial4_quiz_state');
+      }
+    }
+  }
+
+  function setupSecurityListeners() {
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('paste', e => e.preventDefault());
+    document.addEventListener('cut', e => e.preventDefault());
+    document.addEventListener('selectstart', e => e.preventDefault());
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
+        e.preventDefault();
+      }
+    });
+
+    window.addEventListener('blur', triggerViolation);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) triggerViolation();
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && !document.getElementById('quiz-screen').classList.contains('hidden')) {
+        triggerViolation();
+      }
+    });
+  }
+
+  function requestFullScreen() {
+    const doc = document.documentElement;
+    if (doc.requestFullscreen) doc.requestFullscreen().catch(() => {});
+    else if (doc.mozRequestFullScreen) doc.mozRequestFullScreen();
+    else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
+    else if (doc.msRequestFullscreen) doc.msRequestFullscreen();
+  }
+
+  function triggerViolation() {
+    if (document.getElementById('quiz-screen').classList.contains('hidden')) return;
+
+    violationCount++;
+    saveStateToLocalStorage();
+
+    if (violationCount >= 2) {
+      alert("Anda telah melanggar aturan keamanan kuis sebanyak 2 kali. Sistem akan otomatis mengirimkan jawaban Anda!");
+      submitQuiz(true);
+    } else {
+      document.getElementById('warning-text').innerText = `Pelanggaran Terdeteksi (${violationCount}/2)! Dilarang berpindah aplikasi, split screen, atau keluar dari fullscreen.`;
+      document.getElementById('warning-overlay').style.display = 'flex';
+    }
+  }
+
+  function dismissWarning() {
+    document.getElementById('warning-overlay').style.display = 'none';
+    requestFullScreen();
+  }
+
+  function confirmSubmit() {
+    const answeredCount = Object.keys(userAnswers).length;
+    if (answeredCount < TOTAL_SOAL_DIUJI) {
+      if (!confirm(`Anda baru menjawab ${answeredCount} dari ${TOTAL_SOAL_DIUJI} soal. Yakin ingin menyelesaikan kuis?`)) {
+        return;
+      }
+    } else {
+      if (!confirm("Yakin ingin menyelesaikan kuis remedial ini?")) {
+        return;
+      }
+    }
+    submitQuiz(false);
+  }
+
+  function submitQuiz(isForceSubmit = false) {
+    clearInterval(timerInterval);
+
+    let correctCount = 0;
+    quizQuestions.forEach((q, idx) => {
+      const selectedOptionIdx = userAnswers[idx];
+      if (selectedOptionIdx !== undefined && q.options[selectedOptionIdx].isCorrect) {
+        correctCount++;
+      }
+    });
+
+    const finalScore = Math.round((correctCount / TOTAL_SOAL_DIUJI) * 100);
+
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+    document.getElementById('result-score').innerText = finalScore;
+
+    const summaryBox = document.getElementById('result-summary');
+    summaryBox.innerHTML = `Mengirim data jawaban ke server, mohon tunggu...`;
+
+    const payload = {
+      nama: currentStudent.nama,
+      kelas: currentStudent.kelas,
+      nilaiAwal: currentStudent.nilaiAwal,
+      nilaiRemedial: finalScore
+    };
+
+    fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => {
+      const bestScore = Math.max(currentStudent.nilaiAwal, finalScore);
+      const finalStatus = bestScore >= KKM ? "LULUS" : "BELUM LULUS";
+
+      document.getElementById('result-status').innerText = finalStatus;
+      document.getElementById('result-status').className = `status-badge ${bestScore >= KKM ? 'lulus' : 'gagal'}`;
+
+      summaryBox.innerHTML = `
+        <strong>Siswa:</strong> ${currentStudent.nama} (${currentStudent.kelas})<br>
+        <strong>Nilai Awal:</strong> ${currentStudent.nilaiAwal}<br>
+        <strong>Nilai Remedial Ini:</strong> ${finalScore}<br>
+        <strong>Nilai Terbaik (Final):</strong> ${bestScore}<br>
+        <strong>Status Final:</strong> ${finalStatus}<br><br>
+        <small>*Data hasil kuis telah berhasil tersimpan di Google Sheets guru.</small>
+      `;
+
+      localStorage.removeItem('remedial4_quiz_state');
+    })
+    .catch(err => {
+      summaryBox.innerHTML = `Terjadi kesalahan saat menyimpan ke Google Sheets: ${err}. Nilai Anda pada sesi ini: <strong>${finalScore}</strong>`;
+      localStorage.removeItem('remedial4_quiz_state');
+    });
+  }
+
+  function resetToLogin() {
+    location.reload();
+  }
+</script>
+</body>
+</html>
